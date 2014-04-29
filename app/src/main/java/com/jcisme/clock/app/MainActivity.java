@@ -1,9 +1,13 @@
 package com.jcisme.clock.app;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import java.util.Date;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -14,6 +18,19 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateDisplayedTime();
+    }
+
+    private void updateDisplayedTime() {
+        TextView textView = (TextView) findViewById(R.id.textView);
+        Date date = new Date();
+        CharSequence time  = DateFormat.format("hh:mm a", date.getTime());
+        time = time.toString().toUpperCase();
+        textView.setText(time);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
