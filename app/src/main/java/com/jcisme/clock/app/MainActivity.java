@@ -14,53 +14,43 @@ import java.util.Date;
 
 public class MainActivity extends ActionBarActivity {
 
-    private TimeBroadcastReceiver clock = null;
+    private TextView mTextView;
+    private TimeBroadcastReceiver mTimeBroadcastReceiver = new TimeBroadcastReceiver();;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mTextView = (TextView)findViewById(R.id.textView);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        TextView textView = (TextView) findViewById(R.id.textView);
-        clock = new TimeBroadcastReceiver(textView);
-        //TODO - Determine how to get new Handler.Callback to work with receiver
-        registerReceiver(clock, new IntentFilter(Intent.ACTION_TIME_TICK));
-        clock.updateDisplayedTime();
+        registerReceiver(mTimeBroadcastReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+        updateDisplay();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        unregisterReceiver(mTimeBroadcastReceiver);
+    }
 
-        unregisterReceiver(clock);
-        clock = null;
+    protected void updateDisplay() {
+        Date date = new Date();
+        CharSequence time = DateFormat.format("hh:mm a", date.getTime());
+        time = time.toString().toUpperCase();
+        mTextView.setText(time);
     }
 
     private class TimeBroadcastReceiver extends BroadcastReceiver {
 
-        private TextView mTextView = null;
-
-        //TODO - This is hateful. Remove it.
-        public TimeBroadcastReceiver(TextView textView) {
-            mTextView = textView;
-        }
-
         @Override
         public void onReceive(Context context, Intent intent) {
-            updateDisplayedTime();
-        }
-
-        // TODO - Determine if this should be here or in MainActivity (i.e. MVC)
-        public void updateDisplayedTime() {
-            Date date = new Date();
-            CharSequence time = DateFormat.format("hh:mm a", date.getTime());
-            time = time.toString().toUpperCase();
-            mTextView.setText(time);
+            if (Intent.ACTION_TIME_TICK.equalsIgnoreCase(intent.getAction())) {
+                updateDisplay();
+            }
         }
     }
 }
